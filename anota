@@ -1,0 +1,20 @@
+Primeiro: acessa o Main e chama de inicio a funćão
+bootstrap
+
+Segundo: bootstrap instancia o AppModule (agrupa todas as coisas controles)
+
+Terceiro: AppControler obter os acessos e encaminha-los
+
+Quarto: recebe a solicitaćão processa e retornar o resultado
+
+Quinto: chega ao cliente Response
+
+
+
+
+
+Docker: sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Leo)$)" -p 1433:1433 --name sqlservernest --hostname adminnest -d mcr.microsoft.com/mssql/server:2022-latest
+
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pa55w0rd' -p 1433:1433 -d --name mssqllinux microsoft/mssql-server-linux
+
+docker run --privileged -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Leo)$)' -p 1433:1433 -d datagrip/mssql-server-linux
