@@ -8,7 +8,11 @@ export class CreateUserDto {
     email: string;
 
     @IsStrongPassword({
-        minLength: 6
+        minLength: 6,
+        minSymbols: 0,
+        minUppercase: 0,
+        minNumbers: 0,
+        minLowercase: 0
     })
     password: string;
 }
