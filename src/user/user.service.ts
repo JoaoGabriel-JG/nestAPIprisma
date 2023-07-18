@@ -18,8 +18,6 @@ export class UserService {
     }
 
     async show(id: number) {
-        await this.exist(id)
-
         return this.prisma.user.findUnique({
             where: {
                 id
