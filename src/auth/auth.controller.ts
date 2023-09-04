@@ -6,6 +6,7 @@ import {AuthResetDto} from "./dto/auth-reset.dto";
 import {UserService} from "../user/user.service";
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "../guards/auth.guard";
+import {User} from "../decorators/user.decorator";
 
 @Controller('auth')
 export class AuthController {
@@ -36,7 +37,7 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Post('me')
-    async me(@Req() req) {
-        return { me: 'ok', data: req.tokenPayLoad }
+    async me(@User('email') user) {
+        return { user }
     }
 }
