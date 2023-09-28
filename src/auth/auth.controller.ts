@@ -1,4 +1,4 @@
-import {Body, Controller, Post, Req, UseGuards} from "@nestjs/common";
+import {Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors} from "@nestjs/common";
 import {AuthLoginDto} from "./dto/auth-login.dto";
 import {AuthRegisterDto} from "./dto/auth-register.dto";
 import {AuthForgetDto} from "./dto/auth-forget.dto";
@@ -7,6 +7,9 @@ import {UserService} from "../user/user.service";
 import {AuthService} from "./auth.service";
 import {AuthGuard} from "../guards/auth.guard";
 import {User} from "../decorators/user.decorator";
+import {FileInterceptor} from "@nestjs/platform-express";
+import { writeFile } from 'fs/promises'
+import { join } from 'path'
 
 @Controller('auth')
 export class AuthController {
@@ -39,5 +42,15 @@ export class AuthController {
     @Post('me')
     async me(@User('email') user) {
         return { user }
+    }
+
+    @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(AuthGuard)
+    @Post('photo')
+    async uploadPhoto(@User() user, @UploadedFile() photo: Express.Multer.File) {
+
+        writeFile(__dirname)
+
+        return { user, photo }
     }
 }
