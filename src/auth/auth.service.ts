@@ -5,6 +5,7 @@ import {User} from "@prisma/client";
 import {AuthRegisterDto} from "./dto/auth-register.dto";
 import {UserService} from "../user/user.service";
 import * as bcrypt from 'bcrypt'
+import {MailerService} from "@nestjs-modules/mailer";
 
 @Injectable()
 
@@ -16,7 +17,8 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly prisma: PrismaService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly mailer: MailerService
     ) {}
 
     createToken(user: User) {
@@ -86,22 +88,56 @@ export class AuthService {
             throw new UnauthorizedException('Email esta incorreto.')
         }
 
+        const token = this.jwtService.sign({
+            id: user.id
+        }, {
+            expiresIn: '30 minutes',
+            subject: String(user.id),
+            issuer: 'forget',
+            audience: 'users'
+        })
+
+        await this.mailer.sendMail({
+            subject: 'Recuperaćão de senha',
+            to: 'joao@gmail.com.br',
+            template: 'forget',
+            context: {
+                name: user.name,
+                token
+            }
+        })
+
         return true
     }
 
     async reset(password: string, token: string) {
-        const id = 0
+        try {
+            const data: any = this.jwtService.verify(token, {
+                audience: 'users',
+                issuer: 'forget'
+            })
 
-        const user = await this.prisma.user.update({
-            where: {
-                id
-            },
-            data: {
-                password
+            if (isNaN(Number(data.id))) {
+                throw new BadRequestException('Token é invalido')
             }
-        })
 
-        return this.createToken(user)
+            const salt = await bcrypt.genSalt()
+            data.password = await bcrypt.hash(password, salt)
+
+            const user = await this.prisma.user.update({
+                where: {
+                    id: Number(data.id)
+                },
+                data: {
+                    password
+                }
+            })
+
+            return this.createToken(user)
+
+        } catch(e) {
+            throw new BadRequestException(e)
+        }
     }
 
     async register(data: AuthRegisterDto) {
